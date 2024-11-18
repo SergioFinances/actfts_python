@@ -23,8 +23,6 @@ setup(
     author_email = EMAIL,
     url = GITHUB_URL,
     keywords = [],
-    include_package_data=True,
-    package_data={"actfts": ["data/*.csv"]},
     install_requires=[ 
         'requests',
     ],
