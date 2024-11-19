@@ -3,7 +3,7 @@ site_name: actfts package
 nav:
   - Home: index.md
   - Get started: Get_Started.md
-  - Reference: References.md
+  - References: References.md
 
 theme:
   name: readthedocs
