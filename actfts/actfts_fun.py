@@ -2,6 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.stats.diagnostic import acorr_ljungbox
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.stattools import kpss
+from arch.unitroot import PhillipsPerron
+import warnings
+from statsmodels.tools.sm_exceptions import InterpolationWarning
+import scipy.stats as stats
+import pandas as pd
 
 def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
              delta="levels", download=False):
@@ -35,9 +42,6 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     # Calcular Box-Pierce
     Box_Pierce = acorr_ljungbox(data, lags=lag, boxpierce=True)
 
-    # Ljung-Box test
-    #ljung_box_stats = acorr_ljungbox(data, lags=range(1, lag + 1), return_df=True)
-
     # Crear el DataFrame con los resultados
     results_df = pd.DataFrame({
         'Lag': range(lag),
@@ -49,52 +53,71 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
         'Pv_Ljung': Box_Pierce['lb_pvalue']
     })
 
-    plt.show()  # To display the plot
+    # Graficar ACF, PACF y Pv Ljung Box en un solo gráfico
+    fig, ax = plt.subplots(3, 1, figsize=(10, 12))
+
+    # ACF
+    ax[0].stem(range(lag), acf_vals[1:], label='ACF', basefmt=" ")
+    ax[0].set_title("Autocorrelation Function (ACF)")
+    ax[0].set_xlabel('Lag')
+    ax[0].set_ylabel('ACF')
+    ax[0].grid(True, linestyle='--')
+
+    # PACF
+    ax[1].stem(range(lag), pacf_vals[1:], label='PACF', basefmt=" ")
+    ax[1].set_title("Partial Autocorrelation Function (PACF)")
+    ax[1].set_xlabel('Lag')
+    ax[1].set_ylabel('PACF')
+    ax[1].grid(True, linestyle='--')
+
+    # Pv Ljung Box
+    ax[2].plot(Box_Pierce['lb_stat'], label='Ljung-Box Statistic', color='red')
+    ax[2].set_title("Ljung-Box Test (Pv)")
+    ax[2].set_xlabel('Lag')
+    ax[2].set_ylabel('Ljung-Box Stat')
+    ax[2].grid(True, linestyle='--')
     
+    plt.tight_layout()
+    plt.show()
 
     # Stationarity test
-    #def stationarity_tests(data):
-    #    adf = adfuller(data)
-    #    kpss_level = kpss(data, regression='c')
-    #    kpss_trend = kpss(data, regression='ct')
-    #    pp = stats.normaltest(data)
-    #    
-    #    return pd.DataFrame({
-    #        'Statistic': [adf[0], kpss_level[0], kpss_trend[0], pp.statistic],
-    #        'P_Value': [adf[1], kpss_level[1], kpss_trend[1], pp.pvalue]
-    #    }, index=["ADF", "KPSS-Level", "KPSS-Trend", "PP"])
+    def stationarity_tests(data):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=InterpolationWarning)
+            adf = adfuller(data)
+            kpss_level = kpss(data, regression='c')
+            kpss_trend = kpss(data, regression='ct')
+        
+        return pd.DataFrame({
+            'Statistic': [adf[0], kpss_level[0], kpss_trend[0]],
+            'P_Value': [adf[1], kpss_level[1], kpss_trend[1]]
+        }, index=["ADF", "KPSS-Level", "KPSS-Trend"])
 
-    #stationarity_results = stationarity_tests(data)
+    stationarity_results = stationarity_tests(data)
     
     # Normality Tests
-    #def normality_tests(data):
-    #    if np.any(data <= 0):
-    #        shapiro_result = stats.shapiro(data)
-    #        ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
-    #        return pd.DataFrame({
-    #            'Statistic': [shapiro_result.statistic, ks_result.statistic],
-    #            'P_Value': [shapiro_result.pvalue, ks_result.pvalue]
-    #        }, index=["Shapiro Wilks", "Kolmogorov Smirnov"])
+    def normality_tests(data):
+        if np.any(data <= 0):
+            shapiro_result = stats.shapiro(data)
+            ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
+            return pd.DataFrame({
+                'Statistic': [shapiro_result.statistic, ks_result.statistic],
+                'P_Value': [shapiro_result.pvalue, ks_result.pvalue]
+            }, index=["Shapiro Wilks", "Kolmogorov Smirnov"])
 
 
-    #    else:
-    #        bc1 = stats.boxcox(data)
-    #        shapiro_result = stats.shapiro(data)
-    #        ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
-    #        return pd.DataFrame({
-    #            'Statistic': [shapiro_result.statistic, ks_result.statistic, bc1[0]],
-    #            'P_Value': [shapiro_result.pvalue, ks_result.pvalue, np.nan]
-    #        }, index=["Shapiro Wilks", "Kolmogorov Smirnov", "Box Cox"])
+        else:
+            shapiro_result = stats.shapiro(data)
+            ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
+            _, bc_lamda = stats.boxcox(data)
+            return pd.DataFrame({
+                'Statistic': [shapiro_result.statistic, ks_result.statistic, bc_lamda],
+                'P_Value': [shapiro_result.pvalue, ks_result.pvalue, np.nan]
+            }, index=["Shapiro Wilks", "Kolmogorov Smirnov", "Box Cox"])
 
-    #normality_results = normality_tests(data)
+    normality_results = normality_tests(data)
 
-    return results_df
-
-# Example usage:
-# Assuming `data` is a pandas Series or numpy array
-# data = pd.Series(np.random.randn(1000))
-# result = acfinter(data)
-# print(result)
+    return results_df, stationarity_results, normality_results
 
 import os
 import pandas as pd
