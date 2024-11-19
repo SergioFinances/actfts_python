@@ -9,7 +9,8 @@ This package includes a three-time series that automatically updates from the FR
 Below is a practical code example to retrieve GDP data.
 
 ```bash
-datag = DPIEEUU_dataset()
+GDP_data = DPIEEUU_dataset()
+print(GDP_data.head())
 ```
 
 **Personal Consumption Expenditures** This represents the total value of goods and services consumed by households and nonprofit institutions serving households within an economy. As a critical component of GDP, PCE reveals consumer behavior and spending patterns. It covers expenditures on durable goods, non durable goods, and services, providing insights into consumer confidence and living standards.
@@ -17,7 +18,8 @@ datag = DPIEEUU_dataset()
 Below is a handy code that allows you to retrieve PCE data
 
 ```bash
-datag = DPIEEUU_dataset()
+PCEC_data = PCECEEUU_dataset()
+print(PCEC_data.head())
 ```
 
 **Disposable Personal Income** refers to the amount of money households have available for spending and saving after deducting taxes and other mandatory charges. It is an indicator of consumer purchasing power and financial health. DPI significantly impacts consumer spending and saving behaviors, affecting overall economic growth. Analysts frequently study DPI to identify trends in personal savings rates and consumption patterns.
@@ -25,7 +27,8 @@ datag = DPIEEUU_dataset()
 Below is a practical code snippet for obtaining DPI data.
 
 ```bash
-datag = DPIEEUU_dataset()
+DPI_data = DPIEEUU_dataset()
+print(DPI_data.head())
 ```
 
 ## Previews Concepts:
@@ -72,9 +75,13 @@ In this first example, we will analyze the United States GDP time series. We wil
 
 Therefore, we will use the following code to analyze the first ten lags and explain each result of the `acfinter()` function.
 
-```bash
-datag = DPIEEUU_dataset()
+```python
+db_GDP = GDP_data['GDP']
+result = acfinter(db_GDP, lag = 10)
+print(result)
 ```
+
+<img src="https://i.ibb.co/mF5RLb1/README-example-2.png" alt="Example Image" style="width: 1000px; height: 360px;">
 
 The outcome variable encompasses three primary tests: ACF-PACF, Stationarity, and Normality. The ACF-PACF component shows multiple lags significant correlations tested with Box-Pierce and Ljung-Box tests. Regarding stationarity tests, the function `acfinter()` provides ADF, KPSS-Level, KPSS-Trend, and PP results. While each test has nuances, their common aim is to determine if the series is stationary. Both the ADF and PP tests yield p-values of 0.99. Since these values exceed the significance level of 0.95, we do not reject the null hypothesis of stationarity, confirming the presence of a unit root and a trend component in the GDP time series.
 
