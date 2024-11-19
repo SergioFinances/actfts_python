@@ -127,6 +127,7 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     ax[2].axhline(y=0.05, color='blue', linestyle='--', label='0.05 Threshold')
 
     # Ajustar diseño y mostrar
+    fig.subplots_adjust(hspace=0.5)  
     plt.tight_layout()
     plt.show()
 
