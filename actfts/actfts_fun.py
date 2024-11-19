@@ -12,7 +12,7 @@ import pandas as pd
 
 def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
              delta="levels", download=False):
-
+    
     def gen(datag, delta="levels"):
         if not isinstance(datag, (np.ndarray, pd.Series)):
             raise ValueError("The input must be a numeric vector or a time series object.")
@@ -33,16 +33,13 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     ldata = len(data)
     
     if ldata <= lag:
-        lag = ldata - 1  # Adjust lag if it's larger than data length
+        lag = ldata - 1
     
-    # Calcular ACF y PACF
     acf_vals, acf_confint = acf(data, nlags=lag, alpha=ci)
     pacf_vals, pacf_confint = pacf(data, nlags=lag, alpha=ci)
 
-    # Calcular Box-Pierce
     Box_Pierce = acorr_ljungbox(data, lags=lag, boxpierce=True)
 
-    # Crear el DataFrame con los resultados
     results_df = pd.DataFrame({
         'Lag': range(lag),
         'ACF': acf_vals[1:],
@@ -53,7 +50,6 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
         'Pv_Ljung': Box_Pierce['lb_pvalue']
     })
 
-    # Stationarity test
     def stationarity_tests(data):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=InterpolationWarning)
@@ -68,7 +64,6 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
 
     stationarity_results = stationarity_tests(data)
     
-    # Normality Tests
     def normality_tests(data):
         if np.any(data <= 0):
             shapiro_result = stats.shapiro(data)
@@ -77,7 +72,6 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
                 'Statistic': [shapiro_result.statistic, ks_result.statistic],
                 'P_Value': [shapiro_result.pvalue, ks_result.pvalue]
             }, index=["Shapiro Wilks", "Kolmogorov Smirnov"])
-
 
         else:
             shapiro_result = stats.shapiro(data)
@@ -90,8 +84,6 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
 
     normality_results = normality_tests(data)
 
-
-    # Definir get_clim1
     def get_clim1(x, ci=0.95, ci_type="white"):
         if ci_type not in ["white", "ma"]:
             raise ValueError('`ci_type` must be "white" or "ma"')
@@ -100,12 +92,11 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
         
         if ci_type == "ma":
             clim = clim0 * np.sqrt(np.cumsum(np.concatenate(([1], 2 * results_df['ACF']**2))))
-            return clim[:-1]  # Excluir el último elemento
+            return clim[:-1]
         else:
-            lineci1 = np.full(len(results_df['ACF']), clim0)  # Crear un array lleno de clim0
+            lineci1 = np.full(len(results_df['ACF']), clim0)
             return lineci1
 
-    # Definir get_clim2
     def get_clim2(x, ci=0.95, ci_type="white"):
         if ci_type not in ["white", "ma"]:
             raise ValueError('`ci_type` must be "white" or "ma"')
@@ -114,48 +105,40 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
         
         if ci_type == "ma":
             clim = clim0 * np.sqrt(np.cumsum(np.concatenate(([1], 2 * results_df['PACF']**2))))
-            return clim[:-1]  # Excluir el último elemento
+            return clim[:-1]
         else:
-            lineci2 = np.full(len(results_df['PACF']), clim0)  # Crear un array lleno de clim0
+            lineci2 = np.full(len(results_df['PACF']), clim0)
             return lineci2
 
     saveci1 = get_clim1(results_df['ACF'], ci=ci, ci_type=ci_method)
     saveci2 = get_clim2(results_df['PACF'], ci=ci, ci_type=ci_method)
 
-    # Graficar ACF, PACF y Pv Ljung Box en un solo gráfico
     fig, ax = plt.subplots(3, 1, figsize=(10, 12))
 
-    # ACF
     ax[0].stem(range(len(acf_vals[1:])), acf_vals[1:], label='ACF', basefmt=" ")
     ax[0].set_title("Autocorrelation Function (ACF)")
     ax[0].set_xlabel('Lags')
     ax[0].set_ylabel('ACF')
     ax[0].grid(True, linestyle='dotted')
     if ci_method == "ma":
-        # Graficar bandas de confianza variables
         ax[0].plot(range(len(saveci1)), saveci1, color='blue', linestyle='--', label='Upper CI')
         ax[0].plot(range(len(saveci1)), -saveci1, color='blue', linestyle='--', label='Lower CI')
     else:
-        # Graficar líneas de confianza horizontales
         ax[0].axhline(y=saveci1[0], color='blue', linestyle='--', label='Upper CI')
         ax[0].axhline(y=-saveci1[0], color='blue', linestyle='--', label='Lower CI')
 
-    # PACF
     ax[1].stem(range(len(pacf_vals[1:])), pacf_vals[1:], label='PACF', basefmt=" ")
     ax[1].set_title("Partial Autocorrelation Function (PACF)")
     ax[1].set_xlabel('Lags')
     ax[1].set_ylabel('PACF')
     ax[1].grid(True, linestyle='dotted')
     if ci_method == "ma":
-        # Graficar bandas de confianza variables
         ax[1].plot(range(len(saveci2)), saveci2, color='blue', linestyle='--', label='Upper CI')
         ax[1].plot(range(len(saveci2)), -saveci2, color='blue', linestyle='--', label='Lower CI')
     else:
-        # Graficar líneas de confianza horizontales
         ax[1].axhline(y=saveci2[0], color='blue', linestyle='--', label='Upper CI')
         ax[1].axhline(y=-saveci2[0], color='blue', linestyle='--', label='Lower CI')
 
-    # Pv Ljung Box
     ax[2].plot(Box_Pierce['lb_pvalue'], label='Ljung-Box Statistic', color='red', linestyle='None', marker='o', markersize=5)
     ax[2].set_title("Ljung-Box Test (Pv)")
     ax[2].set_xlabel('Lags')

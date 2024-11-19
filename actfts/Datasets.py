@@ -3,34 +3,27 @@ import pandas as pd
 import requests
 from tempfile import NamedTemporaryFile
 
-# Función para descargar y procesar cualquier dataset
 def obtener_dataset(url, dataset_name):
-    """Descarga y procesa el dataset desde una URL específica."""
     headers = {
-        'Cache-Control': 'no-cache',  # Evitar caché
-        'Pragma': 'no-cache'  # Para compatibilidad con navegadores antiguos
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
     }
 
     response = requests.get(url, headers=headers)
     response.raise_for_status()
 
-    # Guardar el archivo temporalmente
     with NamedTemporaryFile(delete=False, suffix=".xls") as temp_file:
         temp_file.write(response.content)
         temp_file_path = temp_file.name
 
-    # Leer y procesar los datos
     data = pd.read_excel(temp_file_path, skiprows=10, usecols=[1], names=[dataset_name])
 
-    # Eliminar el archivo temporal
     os.remove(temp_file_path)
 
-    # Generar el rango de fechas
     start_date = pd.to_datetime("1947-01-01")
     end_date = pd.to_datetime("today")
     date_range = pd.date_range(start=start_date, end=end_date, freq="QE")[:-1]
 
-    # Asignar las fechas y configurar el índice
     data["Date"] = date_range
     data.set_index("Date", inplace=True)
     
