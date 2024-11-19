@@ -13,6 +13,61 @@ import pandas as pd
 def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
              delta="levels", download=False):
     
+    """Perform autocorrelation (ACF), partial autocorrelation (PACF), and stationarity analysis.
+
+    This function computes the autocorrelation function (ACF), partial autocorrelation function (PACF),
+    and various stationarity tests for a given time series dataset. It also supports dynamic visualization
+    of results and allows saving outputs.
+
+    Parameters
+    ----------
+    datag : array-like
+        The input time series data, which can be a numeric vector or a pandas Series.
+    lag : int, optional
+        Maximum number of lags to calculate ACF and PACF, by default 72.
+    ci_method : str, optional
+        Method for calculating confidence intervals for ACF and PACF, either "white" (default) 
+        or "ma" (moving average).
+    ci : float, optional
+        Confidence level for ACF/PACF confidence intervals, by default 0.95.
+    interactive : bool, optional
+        If True, displays interactive plots; if None or False, produces static visualizations. 
+        Default is None.
+    delta : str, optional
+        Transformation applied to the input data. Options are:
+        - "levels" (default): no transformation,
+        - "diff1": first differences,
+        - "diff2": second differences,
+        - "diff3": third differences.
+    download : bool, optional
+        If True, saves the output results as files. Default is False.
+
+    Returns
+    -------
+    tuple
+        - results_df (pd.DataFrame): A dataframe containing the ACF, PACF, Box-Pierce, and Ljung-Box statistics.
+        - stationarity_results (pd.DataFrame): Results from stationarity tests (ADF, KPSS-Level, KPSS-Trend).
+        - normality_results (pd.DataFrame): Results from normality tests (Shapiro-Wilks, Kolmogorov-Smirnov, Box-Cox if applicable).
+
+    Raises
+    ------
+    ValueError
+        If the input data is not numeric or if `delta` or `ci_method` is invalid.
+
+    Notes
+    -----
+    - Stationarity tests performed include:
+      - Augmented Dickey-Fuller (ADF)
+      - KPSS for level and trend
+    - Normality tests performed include:
+      - Shapiro-Wilks
+      - Kolmogorov-Smirnov
+      - Box-Cox (only for positive data)
+    - Confidence intervals for ACF/PACF can be computed using the white noise assumption or 
+      moving average structure (ci_method="ma").
+    - Box-Pierce and Ljung-Box statistics are calculated for serial correlation testing.
+    """
+    
     def gen(datag, delta="levels"):
         if not isinstance(datag, (np.ndarray, pd.Series)):
             raise ValueError("The input must be a numeric vector or a time series object.")
