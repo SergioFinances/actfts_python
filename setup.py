@@ -5,15 +5,18 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 VERSION = '0.1.0'
-DESCRIPTION = 'Description'
+DESCRIPTION = 'The actfts package simplifies time series analysis by providing tools for ACF, PACF, and stationarity tests with dynamic, interactive visualizations. It validates and preprocesses data, computes ACF/PACF for multiple lags, and performs tests like Box-Pierce, Ljung-Box, ADF, KPSS, and PP. Results are organized into tables, exportable as TIFF or Excel files, with an interactive mode for on-screen visualization.'
 PACKAGE_NAME = 'actfts'
-AUTHOR = ''
-EMAIL = ''
-GITHUB_URL = ''
+AUTHOR = ['Sergio Andrés Sierra Luján', 'David Esteban Rodríguez Guevara']
+EMAIL = ['sergiochess95@gmail.com', 'davestss@hotmail.com']
+GITHUB_URL = 'https://github.com/SergioFinances/actfts.git'
+MAINTAINERS = [
+    {'name': 'Sergio Andrés Sierra Luján', 'email': 'sergiochess95@gmail.com'}
+]
 
 setup(
-    name = PACKAGE_NAME,
-    packages = [PACKAGE_NAME],
+    name = 'actfts',
+    packages = ['actfts'],
     version = VERSION,
     license='MIT',
     description = DESCRIPTION,
@@ -22,15 +25,25 @@ setup(
     author = AUTHOR,
     author_email = EMAIL,
     url = GITHUB_URL,
-    keywords = [],
+    keywords = ['finances', 'econometric', 'time series analysis'],
     install_requires=[ 
         'requests',
+        'pandas',
+        'numpy',
+        'arch',
+        'matplotlib',
+        'statsmodels',
+        'lxml_html_clean',
+        'xlrd',
+        'requests_html'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
+        'Topic :: Utilities',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
     ],
+    maintainers=MAINTAINERS
 )
