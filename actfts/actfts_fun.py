@@ -53,6 +53,44 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
         'Pv_Ljung': Box_Pierce['lb_pvalue']
     })
 
+    # Stationarity test
+    def stationarity_tests(data):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=InterpolationWarning)
+            adf = adfuller(data)
+            kpss_level = kpss(data, regression='c')
+            kpss_trend = kpss(data, regression='ct')
+        
+        return pd.DataFrame({
+            'Statistic': [adf[0], kpss_level[0], kpss_trend[0]],
+            'P_Value': [adf[1], kpss_level[1], kpss_trend[1]]
+        }, index=["ADF", "KPSS-Level", "KPSS-Trend"])
+
+    stationarity_results = stationarity_tests(data)
+    
+    # Normality Tests
+    def normality_tests(data):
+        if np.any(data <= 0):
+            shapiro_result = stats.shapiro(data)
+            ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
+            return pd.DataFrame({
+                'Statistic': [shapiro_result.statistic, ks_result.statistic],
+                'P_Value': [shapiro_result.pvalue, ks_result.pvalue]
+            }, index=["Shapiro Wilks", "Kolmogorov Smirnov"])
+
+
+        else:
+            shapiro_result = stats.shapiro(data)
+            ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
+            _, bc_lamda = stats.boxcox(data)
+            return pd.DataFrame({
+                'Statistic': [shapiro_result.statistic, ks_result.statistic, bc_lamda],
+                'P_Value': [shapiro_result.pvalue, ks_result.pvalue, np.nan]
+            }, index=["Shapiro Wilks", "Kolmogorov Smirnov", "Box Cox"])
+
+    normality_results = normality_tests(data)
+
+
     # Definir get_clim1
     def get_clim1(x, ci=0.95, ci_type="white"):
         if ci_type not in ["white", "ma"]:
@@ -90,6 +128,7 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     # ACF
     ax[0].stem(range(len(acf_vals[1:])), acf_vals[1:], label='ACF', basefmt=" ")
     ax[0].set_title("Autocorrelation Function (ACF)")
+    ax[0].set_xlabel('Lags')
     ax[0].set_ylabel('ACF')
     ax[0].grid(True, linestyle='dotted')
     if ci_method == "ma":
@@ -104,6 +143,7 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     # PACF
     ax[1].stem(range(len(pacf_vals[1:])), pacf_vals[1:], label='PACF', basefmt=" ")
     ax[1].set_title("Partial Autocorrelation Function (PACF)")
+    ax[1].set_xlabel('Lags')
     ax[1].set_ylabel('PACF')
     ax[1].grid(True, linestyle='dotted')
     if ci_method == "ma":
@@ -124,46 +164,8 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     ax[2].set_ylim(-0.02, 0.2)
     ax[2].axhline(y=0.05, color='blue', linestyle='--', label='0.05 Threshold')
 
-    fig.subplots_adjust(hspace=0.5)
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.subplots_adjust(hspace=0.52)
     plt.show()
-
-    # Stationarity test
-    def stationarity_tests(data):
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=InterpolationWarning)
-            adf = adfuller(data)
-            kpss_level = kpss(data, regression='c')
-            kpss_trend = kpss(data, regression='ct')
-        
-        return pd.DataFrame({
-            'Statistic': [adf[0], kpss_level[0], kpss_trend[0]],
-            'P_Value': [adf[1], kpss_level[1], kpss_trend[1]]
-        }, index=["ADF", "KPSS-Level", "KPSS-Trend"])
-
-    stationarity_results = stationarity_tests(data)
-    
-    # Normality Tests
-    def normality_tests(data):
-        if np.any(data <= 0):
-            shapiro_result = stats.shapiro(data)
-            ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
-            return pd.DataFrame({
-                'Statistic': [shapiro_result.statistic, ks_result.statistic],
-                'P_Value': [shapiro_result.pvalue, ks_result.pvalue]
-            }, index=["Shapiro Wilks", "Kolmogorov Smirnov"])
-
-
-        else:
-            shapiro_result = stats.shapiro(data)
-            ks_result = stats.ks_2samp(data, np.random.normal(np.mean(data), np.std(data), size=len(data)))
-            _, bc_lamda = stats.boxcox(data)
-            return pd.DataFrame({
-                'Statistic': [shapiro_result.statistic, ks_result.statistic, bc_lamda],
-                'P_Value': [shapiro_result.pvalue, ks_result.pvalue, np.nan]
-            }, index=["Shapiro Wilks", "Kolmogorov Smirnov", "Box Cox"])
-
-    normality_results = normality_tests(data)
 
     return results_df, stationarity_results, normality_results
 
@@ -219,3 +221,8 @@ def PCECEEUU_dataset():
     """Obtiene el dataset de PCECEEUU."""
     file_url = ("https://fred.stlouisfed.org/graph/fredgraph.xls?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=PCEC&scale=left&cosd=1947-01-01&coed=2024-04-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2024-07-31&revision_date=2024-07-31&nd=1947-01-01")
     return obtener_dataset(file_url, "PCECEEUU")
+
+datag = DPIEEUU_dataset()
+x = datag['DPIEEUU']
+eva = acfinter(x)
+print(eva)
