@@ -90,7 +90,6 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     # ACF
     ax[0].stem(range(len(acf_vals[1:])), acf_vals[1:], label='ACF', basefmt=" ")
     ax[0].set_title("Autocorrelation Function (ACF)")
-    ax[0].set_xlabel('Lag')
     ax[0].set_ylabel('ACF')
     ax[0].grid(True, linestyle='dotted')
     if ci_method == "ma":
@@ -105,7 +104,6 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     # PACF
     ax[1].stem(range(len(pacf_vals[1:])), pacf_vals[1:], label='PACF', basefmt=" ")
     ax[1].set_title("Partial Autocorrelation Function (PACF)")
-    ax[1].set_xlabel('Lag')
     ax[1].set_ylabel('PACF')
     ax[1].grid(True, linestyle='dotted')
     if ci_method == "ma":
@@ -120,15 +118,14 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     # Pv Ljung Box
     ax[2].plot(Box_Pierce['lb_pvalue'], label='Ljung-Box Statistic', color='red', linestyle='None', marker='o', markersize=5)
     ax[2].set_title("Ljung-Box Test (Pv)")
-    ax[2].set_xlabel('Lag')
+    ax[2].set_xlabel('Lags')
     ax[2].set_ylabel('Ljung-Box Stat')
     ax[2].grid(True, linestyle='dotted')
     ax[2].set_ylim(-0.02, 0.2)
     ax[2].axhline(y=0.05, color='blue', linestyle='--', label='0.05 Threshold')
 
-    # Ajustar diseño y mostrar
-    fig.subplots_adjust(hspace=0.5)  
-    plt.tight_layout()
+    fig.subplots_adjust(hspace=0.5)
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
 
     # Stationarity test
