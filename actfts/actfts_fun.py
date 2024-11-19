@@ -61,21 +61,23 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     ax[0].set_title("Autocorrelation Function (ACF)")
     ax[0].set_xlabel('Lag')
     ax[0].set_ylabel('ACF')
-    ax[0].grid(True, linestyle='--')
+    ax[0].grid(True, linestyle='dotted')
 
     # PACF
     ax[1].stem(range(lag), pacf_vals[1:], label='PACF', basefmt=" ")
     ax[1].set_title("Partial Autocorrelation Function (PACF)")
     ax[1].set_xlabel('Lag')
     ax[1].set_ylabel('PACF')
-    ax[1].grid(True, linestyle='--')
+    ax[1].grid(True, linestyle='dotted')
 
     # Pv Ljung Box
-    ax[2].plot(Box_Pierce['lb_stat'], label='Ljung-Box Statistic', color='red')
+    ax[2].plot(Box_Pierce['lb_pvalue'], label='Ljung-Box Statistic', color='red', linestyle='None', marker='o', markersize=5)
     ax[2].set_title("Ljung-Box Test (Pv)")
     ax[2].set_xlabel('Lag')
     ax[2].set_ylabel('Ljung-Box Stat')
-    ax[2].grid(True, linestyle='--')
+    ax[2].grid(True, linestyle='dotted')
+    ax[2].set_ylim(-0.02, 0.2)
+    ax[2].axhline(y=0.05, color='blue', linestyle='--', label='0.05 Threshold')
     
     plt.tight_layout()
     plt.show()
