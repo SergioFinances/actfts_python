@@ -9,7 +9,7 @@ This package includes a three-time series that automatically updates from the FR
 Below is a practical code example to retrieve GDP data.
 
 ```python
-GDP_data = DPIEEUU_dataset()
+GDP_data = GDPEEUU_dataset()
 print(GDP_data.head())
 
                GDP
@@ -155,7 +155,7 @@ The argument `ci.method` allows for the selection of constant confidence interva
 When utilizing these arguments, one would set the ci.method argument to "ma" and the ci argument to a confidence interval of 0.98. Thus, the following code can be used:
 
 ```python
-db_GDP = GDP_data['GDP']
+db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, ci_method = "ma", ci = 0.98)
 print(result)
 
@@ -187,12 +187,12 @@ Box Cox              0.124312           NaN)
 
 As illustrated, the function `acfinter()` with the arguments ci.method and ci adjusts the results according to the specified confidence interval. Additionally, it can be observed that the confidence intervals in the plot are not constant but display dynamic behavior.
 
-### Example 3: Use the differences
+### Example Three: Use the differences
 
 Continuing GDP analysis, the "delta" argument can be employed to examine the first three differences in the time series. This analysis will focus on the first difference, and the following code will be utilized.
 
 ```python
-db_GDP = GDP_data['GDP']
+db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, delta = "diff1")
 print(result)
 
@@ -227,20 +227,27 @@ The stationarity tests confirm the first difference in stationarity for the GDP 
 
 Conversely, the normality test indicates that the first difference of the GDP time series is not normally distributed, as the null hypothesis is rejected in both tests. It should be noted that the Box-Cox test for variance stabilization applies only to level time series and not to their differences.
 
-### Example 4: Interactive mode
+### Example Four: Interactive mode
 
 Finally, the function `acfinter()` lets users view the results interactively. The interactive argument should be used, and `True` should be specified. Additionally, dynamic visualization of the results is possible.
 
 Moreover, results from a time series analysis can be downloaded by setting the download argument to TRUE, generating an Excel file containing the numerical results. The file will be saved in the user's Documents folder. Below is an example of the code to use:
 
 ```python
-db_GDP = GDP_data['GDP']
-result = acfinter(db_GDP, interactive = True, download = True)
-print(result)
+db_GDP = GDP_data['GDPEEUU']
+result = acfinter(db_GDP, lag = 10, interactive = True, download = True)
 ```
+
+When you run the code, a link will appear in the terminal for you to access, as shown in the image.
+
+<img src="https://i.ibb.co/GdbMBF3/Parte-1-Interactive.png" alt="Example Image" style="width: 230px; height: 80px;">
+
+When you open the link, you can see a dashboard with four tabs will load in your browser, allowing you to interactively view the results of the ACF and PACF analysis, stationarity tests, normality tests, and a chart displaying the obtained results.
+
+<img src="https://i.ibb.co/L5fy6ZQ/Parte-2-Interactive.png" alt="Example Image" style="width: 1000px; height: 360px;">
 
 # Final considerations
 
 You can analyze time series in xts, ts, integer, and vector (numeric) formats. So, if you use a different format, the `acfinter()` function won't work. In this case, you must convert your data to any format we initially showed you.
 
-Finally, the packages that `acfinter()` uses for its operation are: xts (Ryan & Ulrich, 2020), tseries (Trapletti & Hornik, 2020), reactable (Glaz, 2023), openxlsx (Walker, 2023), plotly (Sievert, 2020), forecast (Hyndman & Khandakar, 2008) and stats (R Core Team, 2023).
+Finally, the packages that `acfinter()` uses for its operation are: NumPy (Harris et al., 2020); Matplotlib (Hunter, 2007); Statsmodels (Seabold, S & Perktold, 2010); ARCH (Sheppard, 2023); SciPy (Virtanen, 2020); Pandas (McKinney, 2010) and Plotly (Plotly Technologies Inc, 2024).
