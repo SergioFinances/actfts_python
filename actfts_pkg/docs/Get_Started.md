@@ -100,38 +100,35 @@ In this first example, we will analyze the United States GDP time series. We wil
 Therefore, we will use the following code to analyze the first ten lags and explain each result of the `acfinter()` function.
 
 ```python
-db_GDP = GDP_data['GDP']
+db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10)
 print(result)
 
- $`ACF-PACF Test`
-   lag       acf          pacf Box_Pierce Pv_Box Ljung_Box Pv_Ljung
-1    1 0.9853471  0.9853470819   300.9818      0  303.9039        0
-2    2 0.9709040 -0.0001677573   593.2047      0  599.9219        0
-3    3 0.9565352 -0.0047242367   876.8421      0  888.1789        0
-4    4 0.9422924 -0.0029745719  1152.0958      0 1168.8297        0
-5    5 0.9284525  0.0065815855  1419.3232      0 1442.1902        0
-6    6 0.9146149 -0.0068823059  1678.6445      0 1708.3357        0
-7    7 0.9010486  0.0021906137  1930.3300      0 1967.4970        0
-8    8 0.8877256  0.0014678003  2174.6276      0 2219.8839        0
-9    9 0.8747132  0.0039691400  2411.8158      0 2465.7401        0
-10  10 0.8620923  0.0067800862  2642.2087      0 2705.3488        0
+(    Lag       ACF      PACF   Box_Pierce         Pv_Box    Ljung_Box       Pv_Ljung
+1     0  0.984998  0.988186   300.768612   2.240358e-67   303.688695   5.177797e-68
+2     1  0.970231  0.000853   592.586602  2.096304e-129   599.296530  7.318331e-131
+3     2  0.955544 -0.005648   875.636514  1.704292e-189   886.956375  5.973796e-192
+4     3  0.940949 -0.005204  1150.105700  1.042756e-247  1166.807310  2.498762e-251
+5     4  0.926706  0.006052  1416.328609  3.986894e-304  1439.140253  4.545097e-309
+6     5  0.912502 -0.007168  1674.453137   0.000000e+00  1704.057532   0.000000e+00
+7     6  0.898587  0.003485  1924.765441   0.000000e+00  1961.804854   0.000000e+00
+8     7  0.884970  0.004182  2167.548857   0.000000e+00  2212.627456   0.000000e+00
+9     8  0.871686  0.006059  2403.098398   0.000000e+00  2456.785120   0.000000e+00
+10    9  0.858883  0.012611  2631.779100   0.000000e+00  2694.613050   0.000000e+00,             
 
-$`Stationary Test`
-           Statistic P_Value
-ADF         2.586751    0.99
-KPSS-Level  4.708600    0.01
-KPSS-Trend  1.215522    0.01
-PP          3.431542    0.99
+             Statistic  P_Value
+ADF          8.948893     1.00
+KPSS-Level   2.421314     0.01
+KPSS-Trend   0.688871     0.01
+PP           9.217001     1.00,                       
 
-$`Normality Test`
-                   Statistic P_Value
-Shapiro Wilks        0.84705       0
-Kolmogorov Smirnov   0.17555       0
-Box Cox              0.15000      NA
+                     Statistic       P_Value
+Shapiro Wilks        0.846595  6.921281e-17
+Kolmogorov Smirnov   0.212903  1.450757e-06
+Box Cox              0.124312           NaN)
 ```
 
-<img src="https://i.ibb.co/mF5RLb1/README-example-2.png" alt="Example Image" style="width: 1000px; height: 360px;">
+<img src="https://i.ibb.co/gPDFtDd/Example-1-mkdocs-actfts.png" alt="Example Image" style="width: 1000px; height: 360px;">
 
 The outcome variable encompasses three primary tests: ACF-PACF, Stationarity, and Normality. The ACF-PACF component shows multiple lags significant correlations tested with Box-Pierce and Ljung-Box tests. Regarding stationarity tests, the function `acfinter()` provides ADF, KPSS-Level, KPSS-Trend, and PP results. While each test has nuances, their common aim is to determine if the series is stationary. Both the ADF and PP tests yield p-values of 0.99. Since these values exceed the significance level of 0.95, we do not reject the null hypothesis of stationarity, confirming the presence of a unit root and a trend component in the GDP time series.
 
@@ -162,32 +159,32 @@ db_GDP = GDP_data['GDP']
 result = acfinter(db_GDP, lag = 10, ci_method = "ma", ci = 0.98)
 print(result)
 
-$`ACF-PACF Test`
-   lag       acf          pacf Box_Pierce Pv_Box Ljung_Box Pv_Ljung
-1    1 0.9849981  0.9849981360   300.7686      0  303.6887        0
-2    2 0.9702311  0.0003276145   592.5866      0  599.2965        0
-3    3 0.9555439 -0.0047507255   875.6365      0  886.9564        0
-4    4 0.9409487 -0.0043825005  1150.1057      0 1166.8073        0
-5    5 0.9267058  0.0043661368  1416.3286      0 1439.1403        0
-6    6 0.9125019 -0.0058830766  1674.4531      0 1704.0575        0
-7    7 0.8985872  0.0023755846  1924.7654      0 1961.8049        0
-8    8 0.8849702  0.0028907399  2167.5489      0 2212.6275        0
-9    9 0.8716864  0.0043086528  2403.0984      0 2456.7851        0
-10  10 0.8588828  0.0093318494  2631.7791      0 2694.6130        0
+(    Lag       ACF      PACF   Box_Pierce         Pv_Box    Ljung_Box       Pv_Ljung
+1     0  0.984998  0.988186   300.768612   2.240358e-67   303.688695   5.177797e-68
+2     1  0.970231  0.000853   592.586602  2.096304e-129   599.296530  7.318331e-131
+3     2  0.955544 -0.005648   875.636514  1.704292e-189   886.956375  5.973796e-192
+4     3  0.940949 -0.005204  1150.105700  1.042756e-247  1166.807310  2.498762e-251
+5     4  0.926706  0.006052  1416.328609  3.986894e-304  1439.140253  4.545097e-309
+6     5  0.912502 -0.007168  1674.453137   0.000000e+00  1704.057532   0.000000e+00
+7     6  0.898587  0.003485  1924.765441   0.000000e+00  1961.804854   0.000000e+00
+8     7  0.884970  0.004182  2167.548857   0.000000e+00  2212.627456   0.000000e+00
+9     8  0.871686  0.006059  2403.098398   0.000000e+00  2456.785120   0.000000e+00
+10    9  0.858883  0.012611  2631.779100   0.000000e+00  2694.613050   0.000000e+00,    
 
-$`Stationary Test`
-           Statistic P_Value
-ADF         2.548975    0.99
-KPSS-Level  4.698172    0.01
-KPSS-Trend  1.206680    0.01
-PP          3.713440    0.99
+             Statistic  P_Value
+ADF          8.948893     1.00
+KPSS-Level   2.421314     0.01
+KPSS-Trend   0.688871     0.01
+PP           9.217001     1.00,
 
-$`Normality Test`
-                   Statistic P_Value
-Shapiro Wilks        0.84660       0
-Kolmogorov Smirnov   0.17612       0
-Box Cox              0.10000      NA
+                     Statistic       P_Value
+Shapiro Wilks        0.846595  6.921281e-17
+Kolmogorov Smirnov   0.196774  1.154750e-05
+Box Cox              0.124312           NaN)
 ```
+
+<img src="https://i.ibb.co/gV4ytJB/Example-2-mkdocs-actfts.png" alt="Example Image" style="width: 1000px; height: 360px;">
+
 As illustrated, the function `acfinter()` with the arguments ci.method and ci adjusts the results according to the specified confidence interval. Additionally, it can be observed that the confidence intervals in the plot are not constant but display dynamic behavior.
 
 ### Example 3: Use the differences
@@ -199,31 +196,31 @@ db_GDP = GDP_data['GDP']
 result = acfinter(db_GDP, lag = 10, delta = "diff1")
 print(result)
 
-$`ACF-PACF Test`
-   lag       acf        pacf Box_Pierce       Pv_Box  Ljung_Box     Pv_Ljung
-1    1 0.1544086 0.154408617   7.367184 6.642486e-03   7.438943 6.382737e-03
-2    2 0.2780836 0.260451259  31.262305 1.627334e-07  31.645400 1.343658e-07
-3    3 0.2692604 0.216815739  53.665171 1.322575e-11  54.414327 9.154788e-12
-4    4 0.2127638 0.113243611  67.653116 7.094325e-14  68.677444 4.318768e-14
-5    5 0.2794033 0.163670374  91.775569 0.000000e+00  93.355348 0.000000e+00
-6    6 0.1550010 0.013327941  99.199386 0.000000e+00 100.975174 0.000000e+00
-7    7 0.2041458 0.049165792 112.077115 0.000000e+00 114.236676 0.000000e+00
-8    8 0.1534914 0.005921702 119.357036 0.000000e+00 121.758455 0.000000e+00
-9    9 0.1653491 0.031889369 127.805195 0.000000e+00 130.516380 0.000000e+00
-10  10 0.1554306 0.022115623 135.270229 0.000000e+00 138.281014 0.000000e+00
+(    Lag       ACF      PACF  Box_Pierce        Pv_Box   Ljung_Box      Pv_Ljung
+1     0  0.154409  0.154910    7.367184  6.642486e-03    7.438943  6.382737e-03
+2     1  0.278084  0.262190   31.262305  1.627334e-07   31.645400  1.343658e-07
+3     2  0.269260  0.219267   53.665171  1.322574e-11   54.414327  9.154778e-12
+4     3  0.212764  0.115314   67.653116  7.099425e-14   68.677444  4.316517e-14
+5     4  0.279403  0.167227   91.775569  2.845872e-18   93.355348  1.324498e-18
+6     5  0.155001  0.014507   99.199386  3.686059e-19  100.975174  1.570574e-19
+7     6  0.204146  0.051024  112.077115  3.402988e-21  114.236676  1.211351e-21
+8     7  0.153491  0.006622  119.357036  4.500494e-22  121.758455  1.436530e-22
+9     8  0.165349  0.033302  127.805195  3.351084e-23  130.516380  9.286704e-24
+10    9  0.155431  0.023311  135.270229  3.917246e-24  138.281014  9.481200e-25,
 
-$`Stationary Test`
-              Statistic    P_Value
-ADF          -5.2254355 0.01000000
-KPSS-Level    2.6917228 0.01000000
-KPSS-Trend    0.2107036 0.01198615
-PP         -375.4889572 0.01000000
+            Statistic       P_Value
+ADF         -3.818244  2.726072e-03
+KPSS-Level   1.928992  1.000000e-02
+KPSS-Trend   0.201485  1.544302e-02
+PP         -18.813147  2.022372e-30,
 
-$`Normality Test`
-                   Statistic P_Value
-Shapiro Wilks        0.55288       0
-Kolmogorov Smirnov   0.27634       0
+                     Statistic       P_Value
+Shapiro Wilks        0.552883  2.316493e-27
+Kolmogorov Smirnov   0.265372  5.652336e-10)
 ```
+
+<img src="https://i.ibb.co/gy04VN5/Example-3-mkdocs-actfts.png" alt="Example Image" style="width: 1000px; height: 360px;">
+
 By setting the argument "delta" to "diff1", the function `acfinter()` will display the first difference of the time series. Firstly, the ACF-PACF test indicates significant autocorrelation at the 10th lag. The Box-Pierce and Ljung-Box tests confirm this finding supported by the plot.
 
 The stationarity tests confirm the first difference in stationarity for the GDP time series; the null hypothesis is rejected. However, the KPSS test results, both at the level and trend, suggest that the first difference of the GDP time series is not stationary.
