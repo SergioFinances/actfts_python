@@ -37,7 +37,9 @@ setup(
         'xlrd',
         'requests_html',
         'dash',
-        'dash matplotlib'
+        'dash matplotlib',
+        'openpyxl',
+        'pathlib'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
