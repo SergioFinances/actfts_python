@@ -13,7 +13,7 @@ from dash import Dash, dash_table, html, dcc
 import base64
 import io
 
-def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
+def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=False,
              delta="levels", download=False):
     
     """Perform autocorrelation (ACF), partial autocorrelation (PACF), and stationarity analysis.

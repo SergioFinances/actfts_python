@@ -229,12 +229,14 @@ Conversely, the normality test indicates that the first difference of the GDP ti
 
 ### Example 4: Interactive mode
 
-Finally, the function `acfinter()` lets users view the results interactively. The interactive argument should be used, and `acftable` should be specified. Additionally, dynamic visualization of the results is possible.
+Finally, the function `acfinter()` lets users view the results interactively. The interactive argument should be used, and `True` should be specified. Additionally, dynamic visualization of the results is possible.
 
-Moreover, results from a time series analysis can be downloaded by setting the download argument to TRUE, generating an Excel file containing the numerical results and a PNG image with a resolution of 300 dpi, which includes the ACF, PACF, and Ljung-Box Pv graphs. The files will be saved in the user's Documents folder. Below is an example of the code to use:
+Moreover, results from a time series analysis can be downloaded by setting the download argument to TRUE, generating an Excel file containing the numerical results. The file will be saved in the user's Documents folder. Below is an example of the code to use:
 
 ```python
-datag = DPIEEUU_dataset()
+db_GDP = GDP_data['GDP']
+result = acfinter(db_GDP, interactive = True, download = True)
+print(result)
 ```
 
 # Final considerations
