@@ -9,6 +9,9 @@ import warnings
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 import scipy.stats as stats
 import pandas as pd
+from dash import Dash, dash_table, html, dcc
+import base64
+import io
 
 def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
              delta="levels", download=False):
@@ -99,7 +102,7 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     Box_Pierce = acorr_ljungbox(data, lags=lag, boxpierce=True)
 
     results_df = pd.DataFrame({
-        'Lag': range(lag),
+        'Lag': range(1, lag + 1),
         'ACF': acf_vals[1:],
         'PACF': pacf_vals[1:],
         'Box_Pierce': Box_Pierce['bp_stat'],
@@ -122,7 +125,7 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
         }, index=["ADF", "KPSS-Level", "KPSS-Trend", "PP"])
 
     stationarity_results = stationarity_tests(data)
-    
+
     def normality_tests(data):
         if np.any(data <= 0):
             shapiro_result = stats.shapiro(data)
@@ -172,41 +175,225 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     saveci1 = get_clim1(results_df['ACF'], ci=ci, ci_type=ci_method)
     saveci2 = get_clim2(results_df['PACF'], ci=ci, ci_type=ci_method)
 
-    fig, ax = plt.subplots(3, 1, figsize=(10, 12))
+    def fig_to_base64(fig):
+        img_buf = io.BytesIO()
+        fig.savefig(img_buf, format='png')
+        img_buf.seek(0)
+        return base64.b64encode(img_buf.read()).decode('utf-8')
 
-    ax[0].stem(range(len(acf_vals[1:])), acf_vals[1:], label='ACF', basefmt=" ")
-    ax[0].set_title("Autocorrelation Function (ACF)")
-    ax[0].set_xlabel('Lags')
-    ax[0].set_ylabel('ACF')
-    ax[0].grid(True, linestyle='dotted')
-    if ci_method == "ma":
-        ax[0].plot(range(len(saveci1)), saveci1, color='blue', linestyle='--', label='Upper CI')
-        ax[0].plot(range(len(saveci1)), -saveci1, color='blue', linestyle='--', label='Lower CI')
+    def generate_graphs():
+        # Crear los gráficos
+        fig, ax = plt.subplots(3, 1, figsize=(10, 12))
+
+        ax[0].stem(range(len(acf_vals[1:])), acf_vals[1:], label='ACF', basefmt=" ")
+        ax[0].set_title("Autocorrelation Function (ACF)")
+        ax[0].set_xlabel('Lags')
+        ax[0].set_ylabel('ACF')
+        ax[0].grid(True, linestyle='dotted')
+        if ci_method == "ma":
+            ax[0].plot(range(len(saveci1)), saveci1, color='blue', linestyle='--', label='Upper CI')
+            ax[0].plot(range(len(saveci1)), -saveci1, color='blue', linestyle='--', label='Lower CI')
+        else:
+            ax[0].axhline(y=saveci1[0], color='blue', linestyle='--', label='Upper CI')
+            ax[0].axhline(y=-saveci1[0], color='blue', linestyle='--', label='Lower CI')
+
+        ax[1].stem(range(len(pacf_vals[1:])), pacf_vals[1:], label='PACF', basefmt=" ")
+        ax[1].set_title("Partial Autocorrelation Function (PACF)")
+        ax[1].set_xlabel('Lags')
+        ax[1].set_ylabel('PACF')
+        ax[1].grid(True, linestyle='dotted')
+        if ci_method == "ma":
+            ax[1].plot(range(len(saveci2)), saveci2, color='blue', linestyle='--', label='Upper CI')
+            ax[1].plot(range(len(saveci2)), -saveci2, color='blue', linestyle='--', label='Lower CI')
+        else:
+            ax[1].axhline(y=saveci2[0], color='blue', linestyle='--', label='Upper CI')
+            ax[1].axhline(y=-saveci2[0], color='blue', linestyle='--', label='Lower CI')
+
+        ax[2].plot(Box_Pierce['lb_pvalue'], label='Ljung-Box Statistic', color='red', linestyle='None', marker='o', markersize=5)
+        ax[2].set_title("Ljung-Box Test (Pv)")
+        ax[2].set_xlabel('Lags')
+        ax[2].set_ylabel('Ljung-Box Stat')
+        ax[2].grid(True, linestyle='dotted')
+        ax[2].set_ylim(-0.02, 0.2)
+        ax[2].axhline(y=0.05, color='blue', linestyle='--', label='0.05 Threshold')
+
+        fig.subplots_adjust(hspace=0.52)
+
+        # Convertir la figura a base64
+        img_base64 = fig_to_base64(fig)
+        return img_base64
+
+    def show_dynamic_table():
+        # Procesar los DataFrames en un formato unificado para ACF/PACF
+        acf_pacf_results = results_df.copy()
+        
+        # Para Stationarity
+        stationarity_results_mod = stationarity_results.reset_index().rename(columns={ 'index': 'Test', 'Statistic': 'Statistic', 'P_Value': 'P_Value' })
+
+        # Para Normality
+        normality_results_mod = normality_results.reset_index().rename(columns={ 'index': 'Test', 'Statistic': 'Statistic', 'P_Value': 'P_Value' })
+
+        # Crear la aplicación Dash
+        app = Dash(__name__)
+        
+        # Configurar la estructura básica del layout
+        layout = html.Div([
+
+            # Título
+            html.H1("Interactive Results from Acfinter() Function", style={'text-align': 'center'}),
+
+            # Tabs para las tablas
+            dcc.Tabs([
+                dcc.Tab(label='ACF/PACF', children=[
+                    dash_table.DataTable(
+                        id='acf-pacf-table',
+                        columns=[{'name': col, 'id': col} for col in acf_pacf_results.columns],
+                        data=acf_pacf_results.to_dict('records'),
+                        page_size=10,
+                        style_table={'height': '500px', 'overflowY': 'auto'},
+                        style_cell={'textAlign': 'left', 'padding': '10px'},
+                        style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
+                        filter_action="native",
+                        sort_action="native"
+                    )
+                ]),
+
+                dcc.Tab(label='Stationarity', children=[
+                    dash_table.DataTable(
+                        id='stationarity-table',
+                        columns=[{'name': col, 'id': col} for col in stationarity_results_mod.columns],
+                        data=stationarity_results_mod.to_dict('records'),
+                        page_size=10,
+                        style_table={'height': '250px', 'overflowY': 'auto'},
+                        style_cell={'textAlign': 'left', 'padding': '10px'},
+                        style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
+                        filter_action="native",
+                        sort_action="native"
+                    )
+                ]),
+
+                dcc.Tab(label='Normality', children=[
+                    dash_table.DataTable(
+                        id='normality-table',
+                        columns=[{'name': col, 'id': col} for col in normality_results_mod.columns],
+                        data=normality_results_mod.to_dict('records'),
+                        page_size=10,
+                        style_table={'height': '250px', 'overflowY': 'auto'},
+                        style_cell={'textAlign': 'left', 'padding': '10px'},
+                        style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
+                        filter_action="native",
+                        sort_action="native"
+                    )
+                ]),
+
+                dcc.Tab(label='Plots', children=[
+                    html.Div([
+                        html.H3('ACF/PACF and PV Ljung', style={'textAlign': 'center'}),  # Centrar el título
+                        html.Div([
+                            html.Img(src=f"data:image/png;base64,{generate_graphs()}", style={'display': 'block', 'margin': '0 auto'})
+                        ], style={'textAlign': 'center'})  # Centrar la imagen
+                    ])
+                ])
+            ])
+        ])
+        
+        app.layout = layout  # Asignar layout una sola vez
+
+        # Ejecutar la aplicación Dash
+        app.run_server(debug=True, use_reloader=False)
+
+    # Condición para ejecutar la tabla interactiva
+    if interactive:
+        show_dynamic_table()
     else:
-        ax[0].axhline(y=saveci1[0], color='blue', linestyle='--', label='Upper CI')
-        ax[0].axhline(y=-saveci1[0], color='blue', linestyle='--', label='Lower CI')
+        fig, ax = plt.subplots(3, 1, figsize=(10, 12))
 
-    ax[1].stem(range(len(pacf_vals[1:])), pacf_vals[1:], label='PACF', basefmt=" ")
-    ax[1].set_title("Partial Autocorrelation Function (PACF)")
-    ax[1].set_xlabel('Lags')
-    ax[1].set_ylabel('PACF')
-    ax[1].grid(True, linestyle='dotted')
-    if ci_method == "ma":
-        ax[1].plot(range(len(saveci2)), saveci2, color='blue', linestyle='--', label='Upper CI')
-        ax[1].plot(range(len(saveci2)), -saveci2, color='blue', linestyle='--', label='Lower CI')
-    else:
-        ax[1].axhline(y=saveci2[0], color='blue', linestyle='--', label='Upper CI')
-        ax[1].axhline(y=-saveci2[0], color='blue', linestyle='--', label='Lower CI')
+        ax[0].stem(range(len(acf_vals[1:])), acf_vals[1:], label='ACF', basefmt=" ")
+        ax[0].set_title("Autocorrelation Function (ACF)")
+        ax[0].set_xlabel('Lags')
+        ax[0].set_ylabel('ACF')
+        ax[0].grid(True, linestyle='dotted')
+        if ci_method == "ma":
+            ax[0].plot(range(len(saveci1)), saveci1, color='blue', linestyle='--', label='Upper CI')
+            ax[0].plot(range(len(saveci1)), -saveci1, color='blue', linestyle='--', label='Lower CI')
+        else:
+            ax[0].axhline(y=saveci1[0], color='blue', linestyle='--', label='Upper CI')
+            ax[0].axhline(y=-saveci1[0], color='blue', linestyle='--', label='Lower CI')
 
-    ax[2].plot(Box_Pierce['lb_pvalue'], label='Ljung-Box Statistic', color='red', linestyle='None', marker='o', markersize=5)
-    ax[2].set_title("Ljung-Box Test (Pv)")
-    ax[2].set_xlabel('Lags')
-    ax[2].set_ylabel('Ljung-Box Stat')
-    ax[2].grid(True, linestyle='dotted')
-    ax[2].set_ylim(-0.02, 0.2)
-    ax[2].axhline(y=0.05, color='blue', linestyle='--', label='0.05 Threshold')
+        ax[1].stem(range(len(pacf_vals[1:])), pacf_vals[1:], label='PACF', basefmt=" ")
+        ax[1].set_title("Partial Autocorrelation Function (PACF)")
+        ax[1].set_xlabel('Lags')
+        ax[1].set_ylabel('PACF')
+        ax[1].grid(True, linestyle='dotted')
+        if ci_method == "ma":
+            ax[1].plot(range(len(saveci2)), saveci2, color='blue', linestyle='--', label='Upper CI')
+            ax[1].plot(range(len(saveci2)), -saveci2, color='blue', linestyle='--', label='Lower CI')
+        else:
+            ax[1].axhline(y=saveci2[0], color='blue', linestyle='--', label='Upper CI')
+            ax[1].axhline(y=-saveci2[0], color='blue', linestyle='--', label='Lower CI')
 
-    fig.subplots_adjust(hspace=0.52)
-    plt.show()
+        ax[2].plot(Box_Pierce['lb_pvalue'], label='Ljung-Box Statistic', color='red', linestyle='None', marker='o', markersize=5)
+        ax[2].set_title("Ljung-Box Test (Pv)")
+        ax[2].set_xlabel('Lags')
+        ax[2].set_ylabel('Ljung-Box Stat')
+        ax[2].grid(True, linestyle='dotted')
+        ax[2].set_ylim(-0.02, 0.2)
+        ax[2].axhline(y=0.05, color='blue', linestyle='--', label='0.05 Threshold')
 
+        fig.subplots_adjust(hspace=0.52)
+        plt.show()
+
+    # Retornar las tablas procesadas
     return results_df, stationarity_results, normality_results
+
+import os
+import pandas as pd
+import requests
+from tempfile import NamedTemporaryFile
+
+def obtener_dataset(url, dataset_name):
+    headers = {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+    }
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    with NamedTemporaryFile(delete=False, suffix=".xls") as temp_file:
+        temp_file.write(response.content)
+        temp_file_path = temp_file.name
+
+    data = pd.read_excel(temp_file_path, skiprows=10, usecols=[1], names=[dataset_name])
+
+    os.remove(temp_file_path)
+
+    start_date = pd.to_datetime("1947-01-01")
+    end_date = pd.to_datetime("today")
+    date_range = pd.date_range(start=start_date, end=end_date, freq="QE")[:-1]
+
+    data["Date"] = date_range
+    data.set_index("Date", inplace=True)
+    
+    return data
+
+def DPIEEUU_dataset():
+    """Retrieves the DPI dataset."""
+    file_url = ("https://fred.stlouisfed.org/graph/fredgraph.xls?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=DPI&scale=left&cosd=1947-01-01&coed=2024-04-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2024-07-31&revision_date=2024-07-31&nd=1947-01-01")
+    return obtener_dataset(file_url, "DPIEEUU")
+
+def GDPEEUU_dataset():
+    """Retrieves the GDP dataset."""
+    file_url = ("https://fred.stlouisfed.org/graph/fredgraph.xls?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=GDP&scale=left&cosd=1947-01-01&coed=2024-04-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2024-07-30&revision_date=2024-07-30&nd=1947-01-01")
+    return obtener_dataset(file_url, "GDPEEUU")
+
+def PCECEEUU_dataset():
+    """Retrieves the PCEC dataset."""
+    file_url = ("https://fred.stlouisfed.org/graph/fredgraph.xls?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1138&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=PCEC&scale=left&cosd=1947-01-01&coed=2024-04-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2020-02-01&line_index=1&transformation=lin&vintage_date=2024-07-31&revision_date=2024-07-31&nd=1947-01-01")
+    return obtener_dataset(file_url, "PCECEEUU")
+
+datag = GDPEEUU_dataset()
+data = datag["GDPEEUU"]
+
+x = acfinter(data, interactive=True)
+print(x)

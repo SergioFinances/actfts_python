@@ -1,4 +1,4 @@
-# Motivation
+# actfts: Autocorrelation Tools Featured for Time Series
 
 This package consolidates various R time series functions related to econometric and financial analysis, integrating these tools into a single package. Educators and researchers can understand time series analysis without the burden of fragmented code spread across multiple resources, creating coherent and efficient results reading.
 
