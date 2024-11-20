@@ -48,6 +48,8 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
         - results_df (pd.DataFrame): A dataframe containing the ACF, PACF, Box-Pierce, and Ljung-Box statistics.
         - stationarity_results (pd.DataFrame): Results from stationarity tests (ADF, KPSS-Level, KPSS-Trend).
         - normality_results (pd.DataFrame): Results from normality tests (Shapiro-Wilks, Kolmogorov-Smirnov, Box-Cox if applicable).
+    plot
+        - tha ACF, PACF and pv ljung plots.
 
     Raises
     ------
@@ -59,6 +61,7 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=None,
     - Stationarity tests performed include:
       - Augmented Dickey-Fuller (ADF)
       - KPSS for level and trend
+      - Phillips-Perron (PP)
     - Normality tests performed include:
       - Shapiro-Wilks
       - Kolmogorov-Smirnov
