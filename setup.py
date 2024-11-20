@@ -5,7 +5,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 VERSION = '0.1.0'
-DESCRIPTION = 'The actfts package simplifies time series analysis by providing tools for ACF, PACF, and stationarity tests with dynamic, interactive visualizations. It validates and preprocesses data, computes ACF/PACF for multiple lags, and performs tests like Box-Pierce, Ljung-Box, ADF, KPSS, and PP. Results are organized into tables, exportable as TIFF or Excel files, with an interactive mode for on-screen visualization.'
+DESCRIPTION = 'The Autocorrelation Tools Featured for Time Series actfts package simplifies time series analysis by providing tools for ACF, PACF, and stationarity tests with dynamic, interactive visualizations. It validates and preprocesses data, computes ACF/PACF for multiple lags, and performs tests like Box-Pierce, Ljung-Box, ADF, KPSS, and PP. Results are organized into tables, exportable as TIFF or Excel files, with an interactive mode for on-screen visualization.'
 PACKAGE_NAME = 'actfts'
 AUTHOR = ['Sergio Andrés Sierra Luján', 'David Esteban Rodríguez Guevara']
 EMAIL = ['sergiochess95@gmail.com', 'davestss@hotmail.com']
@@ -35,7 +35,9 @@ setup(
         'statsmodels',
         'lxml_html_clean',
         'xlrd',
-        'requests_html'
+        'requests_html',
+        'dash',
+        'dash matplotlib'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
