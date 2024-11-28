@@ -2,6 +2,8 @@
 
 The actfts package offers a flexible approach to time series analysis by focusing on Autocorrelation (ACF), Partial Autocorrelation (PACF), and stationarity tests, generating interactive plots for dynamic data visualization. It processes input data by validating and transforming it according to specified differences. It calculates ACF and PACF up to several lags and performs Box-Pierce, Ljung-Box, ADF, KPSS, and PP tests. The function organizes results into tables, with options to save them as TIFF files or Excel spreadsheets, and interactive mode provides on-screen visualization of the ACF-PACF and stationarity test outcomes.
 
+[<img src="https://i.ibb.co/NxmBNBf/Logo-R-ACTFTS.png" width="100">](https://github.com/SergioFinances/actfts.git)
+
 You can view all the package information at the following link
 [actfts Web Page](https://github.com/SergioFinances/actfts.git)
 

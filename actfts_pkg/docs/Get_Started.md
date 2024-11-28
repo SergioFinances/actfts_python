@@ -1,5 +1,11 @@
 # Get Started
 
+To install the actfts package in your Python environment, use the following command:
+
+```python
+pip install actfts=0.1.0
+```
+
 ## Demo Data
 
 This package includes a three-time series that automatically updates from the FRED (s.f) database of the United States. These datasets allow you to practice using the package’s functions. Below is a brief description of each:
