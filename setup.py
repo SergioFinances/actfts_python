@@ -26,20 +26,18 @@ setup(
     author_email = EMAIL,
     url = GITHUB_URL,
     keywords = ['finances', 'econometric', 'time series analysis'],
-    install_requires=[ 
-        'requests',
-        'pandas',
-        'numpy',
-        'arch',
-        'matplotlib',
-        'statsmodels',
-        'lxml_html_clean',
-        'xlrd',
-        'requests_html',
-        'dash',
-        'matplotlib',
-        'openpyxl',
-        'pathlib'
+    install_requires=[
+        'requests>=2.20.0',
+        'pandas>=1.3.0',
+        'numpy>=1.21.0',
+        'arch>=4.0',
+        'matplotlib>=3.3.0',
+        'statsmodels>=0.12.0',
+        'lxml_html_clean>=0.4.0',
+        'xlrd>=2.0.1',
+        'dash>=2.0.0',
+        'openpyxl>=3.0.0',
+        'pathlib; python_version<"3.4"'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
