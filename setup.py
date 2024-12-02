@@ -37,7 +37,7 @@ setup(
         'xlrd',
         'requests_html',
         'dash',
-        'dash matplotlib',
+        'matplotlib',
         'openpyxl',
         'pathlib'
     ],
