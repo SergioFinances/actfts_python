@@ -9,7 +9,7 @@ DESCRIPTION = 'The Autocorrelation Tools Featured for Time Series actfts package
 PACKAGE_NAME = 'actfts'
 AUTHOR = ['Sergio Andrés Sierra Luján', 'David Esteban Rodríguez Guevara']
 EMAIL = ['sergiochess95@gmail.com', 'davestss@hotmail.com']
-GITHUB_URL = 'https://github.com/SergioFinances/actfts.git'
+GITHUB_URL = 'https://sergiofinances.github.io/actfts/'
 MAINTAINERS = [
     {'name': 'Sergio Andrés Sierra Luján', 'email': 'sergiochess95@gmail.com'}
 ]
