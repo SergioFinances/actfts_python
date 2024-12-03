@@ -34,11 +34,13 @@ setup(
         'arch',
         'statsmodels',
         'xlrd',
-        'dash>=2.18.2',
+        'dash',
         'openpyxl',
         'scipy',
         'plotly',
-        'pytest'
+        'pytest',
+        'shutil',
+        'sys'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

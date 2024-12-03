@@ -14,6 +14,8 @@ import base64
 import io
 import os
 from pathlib import Path
+import shutil
+import sys
 
 def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=False,
              delta="levels", download=False):
@@ -346,14 +348,26 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=False,
         plt.show()
 
     if download:
-        # Obtener el directorio de descargas del usuario
-        downloads_folder = str(Path.home() / "Downloads")
-        filename = os.path.join(downloads_folder, "Results.xlsx")
+        if 'google.colab' in sys.modules:
+            from google.colab import files
+            filename = "/content/Results.xlsx"
+            with pd.ExcelWriter(filename, engine="openpyxl") as writer:
+                results_df.to_excel(writer, sheet_name="ACF_PACF", index=False)
+                stationarity_results.to_excel(writer, sheet_name="Stationarity", index=True)
+                normality_results.to_excel(writer, sheet_name="Normality", index=True)
 
-        with pd.ExcelWriter(filename, engine="openpyxl") as writer:
-            results_df.to_excel(writer, sheet_name="ACF_PACF", index=False)
-            stationarity_results.to_excel(writer, sheet_name="Stationarity", index=True)
-            normality_results.to_excel(writer, sheet_name="Normality", index=True)
+            files.download(filename)
+        
+        else:
+            downloads_folder = str(Path.home() / "Downloads")
+            filename = os.path.join(downloads_folder, "Results.xlsx")
+            with pd.ExcelWriter(filename, engine="openpyxl") as writer:
+                results_df.to_excel(writer, sheet_name="ACF_PACF", index=False)
+                stationarity_results.to_excel(writer, sheet_name="Stationarity", index=True)
+                normality_results.to_excel(writer, sheet_name="Normality", index=True)
+
+            print(f"Archivo guardado en: {filename}")
 
     # Retornar las tablas procesadas
     return results_df, stationarity_results, normality_results
+
