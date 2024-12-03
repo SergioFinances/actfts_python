@@ -1,5 +1,5 @@
 from pathlib import Path
-from setuptools import setup, find_packages
+from setuptools import setup
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
@@ -26,7 +26,6 @@ setup(
     author_email = EMAIL,
     url = GITHUB_URL,
     keywords = ['finances', 'econometric', 'time series analysis'],
-    packages=find_packages(),
     install_requires=[
         'requests',
         'numpy',
