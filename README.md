@@ -14,8 +14,8 @@ This is a basic example which shows you how to use actfts packcage:
 ```bash
 pip install actfts=0.1.0
 
-import pandas as pd
 from actfts.actfts_fun import acfinter
+from actfts.Datasets import DPIEEUU_dataset
 
 datag = DPIEEUU_dataset()
 data = datag['DPIEEUU']

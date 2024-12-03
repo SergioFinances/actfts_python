@@ -15,6 +15,7 @@ This package includes a three-time series that automatically updates from the FR
 Below is a practical code example to retrieve GDP data.
 
 ```python
+from actfts.Datasets import GDPEEUU_dataset
 GDP_data = GDPEEUU_dataset()
 print(GDP_data.head())
 
@@ -32,6 +33,7 @@ print(GDP_data.head())
 Below is a handy code that allows you to retrieve PCE data
 
 ```python
+from actfts.Datasets import PCECEEUU_dataset
 PCEC_data = PCECEEUU_dataset()
 print(PCEC_data.head())
 
@@ -49,6 +51,7 @@ print(PCEC_data.head())
 Below is a practical code snippet for obtaining DPI data.
 
 ```python
+from actfts.Datasets import DPIEEUU_dataset
 DPI_data = DPIEEUU_dataset()
 print(DPI_data.head())
 
@@ -106,6 +109,8 @@ In this first example, we will analyze the United States GDP time series. We wil
 Therefore, we will use the following code to analyze the first ten lags and explain each result of the `acfinter()` function.
 
 ```python
+from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
 db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10)
 print(result)
@@ -161,6 +166,8 @@ The argument `ci.method` allows for the selection of constant confidence interva
 When utilizing these arguments, one would set the ci.method argument to "ma" and the ci argument to a confidence interval of 0.98. Thus, the following code can be used:
 
 ```python
+from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
 db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, ci_method = "ma", ci = 0.98)
 print(result)
@@ -198,6 +205,8 @@ As illustrated, the function `acfinter()` with the arguments ci.method and ci ad
 Continuing GDP analysis, the "delta" argument can be employed to examine the first three differences in the time series. This analysis will focus on the first difference, and the following code will be utilized.
 
 ```python
+from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
 db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, delta = "diff1")
 print(result)
@@ -240,6 +249,8 @@ Finally, the function `acfinter()` lets users view the results interactively. Th
 Moreover, results from a time series analysis can be downloaded by setting the download argument to TRUE, generating an Excel file containing the numerical results. The file will be saved in the user's Documents folder. Below is an example of the code to use:
 
 ```python
+from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
 db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, interactive = True, download = True)
 ```

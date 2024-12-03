@@ -31,17 +31,13 @@ setup(
         'pandas',
         'numpy',
         'matplotlib',
+        'arch',
         'statsmodels',
         'xlrd',
-        'dash',
+        'dash >= 2.18.2',
         'openpyxl',
         'pathlib'
     ],
-    extras_require={
-        'arch': [
-            'arch',
-        ],
-    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Education',
