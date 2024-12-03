@@ -36,7 +36,9 @@ setup(
         'xlrd',
         'dash>=2.18.2',
         'openpyxl',
-        'pathlib'
+        'scipy',
+        'plotly',
+        'pytest'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
