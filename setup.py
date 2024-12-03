@@ -30,7 +30,7 @@ setup(
         'requests',
         'pandas',
         'numpy',
-        'arch',
+        'arch >=7.2.0',
         'matplotlib',
         'statsmodels',
         'lxml',
