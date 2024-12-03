@@ -37,8 +37,14 @@ setup(
         'werkzeug',
         'plotly',
         'openpyxl',
-        'arch',
-        'dash', 
+        'dash',
+        'python-dateutil',
+        'pytz',
+        'tzdata',
+        'patsy',
+        'packaging',
+        'six',
+        'arch'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
