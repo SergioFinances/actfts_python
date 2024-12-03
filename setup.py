@@ -34,6 +34,7 @@ setup(
         'scipy',
         'pandas',
         'Flask',
+        'werkzeug',
         'plotly',
         'openpyxl',
         'arch',
