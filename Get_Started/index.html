@@ -119,7 +119,8 @@
 <p>This package includes a three-time series that automatically updates from the FRED (s.f) database of the United States. These datasets allow you to practice using the package’s functions. Below is a brief description of each:</p>
 <p><strong>Gross Domestic Product</strong>, This measure quantifies the total monetary value of all goods and services produced within a country over a specific period, typically a quarter or a year. It provides a comprehensive overview of a nation’s economic activity, reflecting its size and economic health. Economists often use GDP to compare economic performance across countries or regions and assess the impact of economic policies.</p>
 <p>Below is a practical code example to retrieve GDP data.</p>
-<pre><code class="language-python">GDP_data = GDPEEUU_dataset()
+<pre><code class="language-python">from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
 print(GDP_data.head())
 
                GDP
@@ -132,7 +133,8 @@ print(GDP_data.head())
 </code></pre>
 <p><strong>Personal Consumption Expenditures</strong> This represents the total value of goods and services consumed by households and nonprofit institutions serving households within an economy. As a critical component of GDP, PCE reveals consumer behavior and spending patterns. It covers expenditures on durable goods, non durable goods, and services, providing insights into consumer confidence and living standards.</p>
 <p>Below is a handy code that allows you to retrieve PCE data</p>
-<pre><code class="language-python">PCEC_data = PCECEEUU_dataset()
+<pre><code class="language-python">from actfts.Datasets import PCECEEUU_dataset
+PCEC_data = PCECEEUU_dataset()
 print(PCEC_data.head())
 
               PCEC
@@ -145,7 +147,8 @@ print(PCEC_data.head())
 </code></pre>
 <p><strong>Disposable Personal Income</strong> refers to the amount of money households have available for spending and saving after deducting taxes and other mandatory charges. It is an indicator of consumer purchasing power and financial health. DPI significantly impacts consumer spending and saving behaviors, affecting overall economic growth. Analysts frequently study DPI to identify trends in personal savings rates and consumption patterns.</p>
 <p>Below is a practical code snippet for obtaining DPI data.</p>
-<pre><code class="language-python">DPI_data = DPIEEUU_dataset()
+<pre><code class="language-python">from actfts.Datasets import DPIEEUU_dataset
+DPI_data = DPIEEUU_dataset()
 print(DPI_data.head())
 
                DPI
@@ -178,7 +181,9 @@ print(DPI_data.head())
 <h3 id="example-one-basics-testing">Example one: basics testing</h3>
 <p>In this first example, we will analyze the United States GDP time series. We will use the <code>acfinter()</code> function to see the ACF, PACF, Box_Pierce, Pv_Box, Ljung_Box, and Pv_Ljung. We can also see the normality analysis and stationarity analysis. Finally, a plot with ACF, PACF, and Pv LJUNG BOX.</p>
 <p>Therefore, we will use the following code to analyze the first ten lags and explain each result of the <code>acfinter()</code> function.</p>
-<pre><code class="language-python">db_GDP = GDP_data['GDPEEUU']
+<pre><code class="language-python">from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
+db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10)
 print(result)
 
@@ -222,7 +227,9 @@ Box Cox              0.124312           NaN)
 <p>The output of the function <code>acfinter()</code> has been discussed. The following examples will explore how to utilize each argument of the function and provide important considerations for its proper application.</p>
 <p>The argument <code>ci.method</code> allows for the selection of constant confidence intervals ("white") or dynamic confidence intervals ("ma"). The <code>ci</code> argument specifies any desired value between 0 and 0.99.</p>
 <p>When utilizing these arguments, one would set the ci.method argument to "ma" and the ci argument to a confidence interval of 0.98. Thus, the following code can be used:</p>
-<pre><code class="language-python">db_GDP = GDP_data['GDPEEUU']
+<pre><code class="language-python">from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
+db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, ci_method = &quot;ma&quot;, ci = 0.98)
 print(result)
 
@@ -253,7 +260,9 @@ Box Cox              0.124312           NaN)
 <p>As illustrated, the function <code>acfinter()</code> with the arguments ci.method and ci adjusts the results according to the specified confidence interval. Additionally, it can be observed that the confidence intervals in the plot are not constant but display dynamic behavior.</p>
 <h3 id="example-three-use-the-differences">Example Three: Use the differences</h3>
 <p>Continuing GDP analysis, the "delta" argument can be employed to examine the first three differences in the time series. This analysis will focus on the first difference, and the following code will be utilized.</p>
-<pre><code class="language-python">db_GDP = GDP_data['GDPEEUU']
+<pre><code class="language-python">from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
+db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, delta = &quot;diff1&quot;)
 print(result)
 
@@ -286,7 +295,9 @@ Kolmogorov Smirnov   0.265372  5.652336e-10)
 <h3 id="example-four-interactive-mode">Example Four: Interactive mode</h3>
 <p>Finally, the function <code>acfinter()</code> lets users view the results interactively. The interactive argument should be used, and <code>True</code> should be specified. Additionally, dynamic visualization of the results is possible.</p>
 <p>Moreover, results from a time series analysis can be downloaded by setting the download argument to TRUE, generating an Excel file containing the numerical results. The file will be saved in the user's Documents folder. Below is an example of the code to use:</p>
-<pre><code class="language-python">db_GDP = GDP_data['GDPEEUU']
+<pre><code class="language-python">from actfts.Datasets import GDPEEUU_dataset
+GDP_data = GDPEEUU_dataset()
+db_GDP = GDP_data['GDPEEUU']
 result = acfinter(db_GDP, lag = 10, interactive = True, download = True)
 </code></pre>
 <p>When you run the code, a link will appear in the terminal for you to access, as shown in the image.</p>
