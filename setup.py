@@ -4,7 +4,7 @@ from setuptools import setup
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 DESCRIPTION = 'The Autocorrelation Tools Featured for Time Series actfts package simplifies time series analysis by providing tools for ACF, PACF, and stationarity tests with dynamic, interactive visualizations. It validates and preprocesses data, computes ACF/PACF for multiple lags, and performs tests like Box-Pierce, Ljung-Box, ADF, KPSS, and PP. Results are organized into tables, exportable as TIFF or Excel files, with an interactive mode for on-screen visualization.'
 PACKAGE_NAME = 'actfts'
 AUTHOR = ['Sergio Andrés Sierra Luján', 'David Esteban Rodríguez Guevara']
