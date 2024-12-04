@@ -4,7 +4,7 @@ from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.stattools import kpss
-from arch.unitroot import PhillipsPerron
+import statsmodels.api as sm
 import warnings
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 import scipy.stats as stats
@@ -115,17 +115,30 @@ def acfinter(datag, lag=72, ci_method="white", ci=0.95, interactive=False,
         'Pv_Ljung': Box_Pierce['lb_pvalue']
     })
 
+    def phillips_perron(ts_data, max_lag=1):
+        ts_diff = ts_data.diff().dropna()
+        X = sm.add_constant(ts_data.shift(1).dropna())
+        y = ts_diff
+        X, y = X.align(y, join='inner', axis=0)
+        model = sm.OLS(y, X).fit()
+        gamma_hat = model.params[1]
+        std_error = model.bse[1]
+        pp_statistic = gamma_hat / std_error
+        adf_result = adfuller(ts_data, maxlag=max_lag, regression='ct')
+        p_value = adf_result[1]
+        return pp_statistic, p_value
+
     def stationarity_tests(data):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=InterpolationWarning)
             adf = adfuller(data)
             kpss_level = kpss(data, regression='c')
             kpss_trend = kpss(data, regression='ct')
-            pp_result = PhillipsPerron(data)
+            pp_result = phillips_perron(pd.Series(data))
         
         return pd.DataFrame({
-            'Statistic': [adf[0], kpss_level[0], kpss_trend[0], pp_result.stat],
-            'P_Value': [adf[1], kpss_level[1], kpss_trend[1], pp_result.pvalue]
+            'Statistic': [adf[0], kpss_level[0], kpss_trend[0], pp_result[0]],
+            'P_Value': [adf[1], kpss_level[1], kpss_trend[1], pp_result[1]]
         }, index=["ADF", "KPSS-Level", "KPSS-Trend", "PP"])
 
     stationarity_results = stationarity_tests(data)

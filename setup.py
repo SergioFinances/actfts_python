@@ -43,8 +43,7 @@ setup(
         'tzdata>=2022.7',
         'patsy>=0.5.6',
         'packaging>=21.3',
-        'six>=1.5',
-        'arch'
+        'six>=1.5'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
