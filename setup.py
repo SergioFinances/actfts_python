@@ -37,13 +37,7 @@ setup(
         'Werkzeug==2.0.3',
         'plotly',
         'openpyxl',
-        'dash',
-        'python-dateutil>=2.8.2',
-        'pytz>=2020.1',
-        'tzdata>=2022.7',
-        'patsy>=0.5.6',
-        'packaging>=21.3',
-        'six>=1.5'
+        'dash'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
